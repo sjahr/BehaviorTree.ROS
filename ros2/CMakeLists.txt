@@ -14,6 +14,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_action
 )
 
+if(BUILD_EXAMPLE)
 add_executable(bt_executable
     examples/fibonacci_bt.cpp
 )
@@ -25,12 +26,6 @@ ament_target_dependencies(bt_executable
   PUBLIC
     ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
-
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
-
 install(
   TARGETS
     bt_executable
@@ -41,6 +36,13 @@ install(
   RUNTIME DESTINATION
     lib/${PROJECT_NAME}
 )
+endif()
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
 
 ament_export_include_directories(include)
 
