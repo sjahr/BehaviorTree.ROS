@@ -114,7 +114,7 @@ public:
       //// Feedback callback is received as function argument and forwarded to the action client
       options.feedback_callback = feedback_callback;
       // Set result callback
-      options.result_callback = [=, this](WrappedResult const& wrapped_result) {
+      options.result_callback = [=](WrappedResult const& wrapped_result) {
         // Handle the result with the function provided by the entity which calls sendGoal(..)
         result_callback(wrapped_result);
       };
