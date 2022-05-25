@@ -125,6 +125,7 @@ public:
             return processResult(wrapped_result_.value());
           }
         }
+        break; // insert 'break;' to avoid fall-through
       }  // case BT::NodeStatus::RUNNING:
       case BT::NodeStatus::FAILURE:
         break;
