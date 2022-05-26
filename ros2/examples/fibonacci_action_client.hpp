@@ -34,40 +34,39 @@
 
 #pragma once
 
+#include "example_interfaces/action/fibonacci.hpp"  // for Fibonacci
+
+#include <optional>  // for std::optional
+
+#include <rclcpp/logger.hpp>  // for rclcpp::Logger
+
 #include <behaviortree_ros2/bt_action_client.hpp>  // for ActionClientNode
-#include "example_interfaces/action/fibonacci.hpp"       // for Fibonacci
-#include <optional>                                      // for std::optional
-#include <rclcpp/logger.hpp>                             // for rclcpp::Logger
 
-namespace BT::ros2
-{
+namespace BT::ros2 {
 using Fibonacci = example_interfaces::action::Fibonacci;
-using FibonacciWrappedResult = rclcpp_action::ClientGoalHandle<Fibonacci>::WrappedResult;
+using FibonacciWrappedResult =
+    rclcpp_action::ClientGoalHandle<Fibonacci>::WrappedResult;
 
-namespace
-{
+namespace {
 auto const LOGGER = rclcpp::get_logger("FibonacciClientNode");
 }
-class FibonacciClient : public ActionClientNode<Fibonacci>
-{
-public:
+class FibonacciClient : public ActionClientNode<Fibonacci> {
+ public:
   using ActionClientNode<Fibonacci>::ActionClientNode;
   virtual ~FibonacciClient() = default;
-  [[nodiscard]] std::optional<Fibonacci::Goal> defineGoal() override
-  {
+  [[nodiscard]] std::optional<Fibonacci::Goal> defineGoal() override {
     // Create goal
     auto goal_msg = Fibonacci::Goal();
     goal_msg.order = 10;
     return goal_msg;
   };
-  void handleFeedback(std::shared_ptr<Fibonacci::Feedback const> const /*feedback*/) override
-  {
+  void handleFeedback(
+      std::shared_ptr<Fibonacci::Feedback const> const /*feedback*/) override {
     RCLCPP_INFO_STREAM(LOGGER, "Waiting for result");
   };
-  [[nodiscard]] BT::NodeStatus processResult(FibonacciWrappedResult const& wrapped_result) override
-  {
-    switch (wrapped_result.code)
-    {
+  [[nodiscard]] BT::NodeStatus processResult(
+      FibonacciWrappedResult const& wrapped_result) override {
+    switch (wrapped_result.code) {
       case rclcpp_action::ResultCode::SUCCEEDED:
         RCLCPP_INFO(LOGGER, "Goal was successful");
         return BT::NodeStatus::SUCCESS;
@@ -83,7 +82,7 @@ public:
   };
 
   void halt() override{
-    // Do nothing
+      // Do nothing
   };
 };
 }  // namespace BT::ros2

@@ -32,18 +32,20 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <behaviortree_cpp_v3/bt_factory.h>             // for BehaviorTreeFactory, NodeStatus
-#include <chrono>                                       // for milliseconds
-#include <iostream>                                     // for cin.get()
-#include <rclcpp/rclcpp.hpp>                            // for Node, MultiThreadedExecutor, ok()
-#include <rclcpp/logger.hpp>                            // for rclcpp::Loggers
-#include <thread>                                       // for sleep_for
-#include <behaviortree_ros2/ros2_action_api.hpp>  // for ActionClientApi
-#include "example_interfaces/action/fibonacci.hpp"      // for Fibonacci
+#include "example_interfaces/action/fibonacci.hpp"  // for Fibonacci
 #include "fibonacci_action_client.hpp"
 
-namespace
-{
+#include <chrono>    // for milliseconds
+#include <iostream>  // for cin.get()
+#include <thread>    // for sleep_for
+
+#include <rclcpp/logger.hpp>  // for rclcpp::Loggers
+#include <rclcpp/rclcpp.hpp>  // for Node, MultiThreadedExecutor, ok()
+
+#include <behaviortree_cpp_v3/bt_factory.h>  // for BehaviorTreeFactory, NodeStatus
+#include <behaviortree_ros2/ros2_action_api.hpp>  // for ActionClientApi
+
+namespace {
 using namespace std::chrono_literals;
 auto const LOGGER = rclcpp::get_logger("BehaviorTree");
 auto const SERVER_RESPONSE_TIME = 100ms;
@@ -59,37 +61,41 @@ constexpr auto BT_DESCRIPTION = R"(
     </root>)";
 }  // namespace
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Initialize ROS2
   rclcpp::init(argc, argv);
-  auto const shared_node = std::make_shared<rclcpp::Node>("example_node", rclcpp::NodeOptions{});
+  auto const shared_node =
+      std::make_shared<rclcpp::Node>("example_node", rclcpp::NodeOptions{});
 
   // Create action API handle
   using Fibonacci = example_interfaces::action::Fibonacci;
   auto action_api_handle =
-      std::make_shared<BT::ros2::ActionClientApi<Fibonacci>>(shared_node, "fibonacci", SERVER_RESPONSE_TIME);
+      std::make_shared<BT::ros2::ActionClientApi<Fibonacci>>(
+          shared_node, "fibonacci", SERVER_RESPONSE_TIME);
 
   // Create BT
   BT::BehaviorTreeFactory factory;
-  factory.registerBuilder<BT::ros2::FibonacciClient>("FibonacciAction", [&](const std::string& name,
-                                                                            BT::NodeConfiguration const& config) {
-    return std::make_unique<BT::ros2::FibonacciClient>(name, config, action_api_handle);
-  });
+  factory.registerBuilder<BT::ros2::FibonacciClient>(
+      "FibonacciAction",
+      [&](const std::string& name, BT::NodeConfiguration const& config) {
+        return std::make_unique<BT::ros2::FibonacciClient>(name, config,
+                                                           action_api_handle);
+      });
   auto tree = factory.createTreeFromText(BT_DESCRIPTION);
 
-  // Halt the program to enable the user to start introspection tools (e.g. Groot)
+  // Halt the program to enable the user to start introspection tools (e.g.
+  // Groot)
   RCLCPP_INFO_STREAM(LOGGER,
-                     "Please start the action server for this example. Afterward, hit enter to start the action");
+                     "Please start the action server for this example. "
+                     "Afterward, hit enter to start the action");
   std::cin.get();
 
-  // Create second thread which ticks the tree /TODO(sjahr): Remove this and let the executor handle all threads
+  // Create second thread which ticks the tree /TODO(sjahr): Remove this and let
+  // the executor handle all threads
   std::thread tick_tree([&]() {
     // Keep ticking until it returns either SUCCESS or FAILURE
-    while (rclcpp::ok())
-    {
-      if (tree.tickRoot() != BT::NodeStatus::RUNNING)
-      {
+    while (rclcpp::ok()) {
+      if (tree.tickRoot() != BT::NodeStatus::RUNNING) {
         break;
       }
       std::this_thread::sleep_for(TREE_RATE);
