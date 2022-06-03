@@ -20,7 +20,6 @@ add_executable(bt_executable
 target_include_directories(bt_executable PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_features(bt_executable PUBLIC cxx_std_20)
 ament_target_dependencies(bt_executable
   PUBLIC
     ${THIS_PACKAGE_INCLUDE_DEPENDS}
