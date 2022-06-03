@@ -14,7 +14,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_action
 )
 
-if(BUILD_EXAMPLE)
 add_executable(bt_executable
     examples/fibonacci_bt.cpp
 )
@@ -36,7 +35,6 @@ install(
   RUNTIME DESTINATION
     lib/${PROJECT_NAME}
 )
-endif()
 
 install(
   DIRECTORY include/
