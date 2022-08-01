@@ -34,6 +34,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include <action_msgs/msg/goal_status.hpp>    // for GoalStatus
 #include <behaviortree_cpp_v3/action_node.h>  // for ActionNodeBase
 #include <behaviortree_ros2/action_client_interface.hpp>  // for ActionClientInterface<ActionT>
@@ -68,6 +70,7 @@ class ActionClientNode : public BT::ActionNodeBase {
     switch (status()) {
       // On startup
       case BT::NodeStatus::IDLE: {
+        auto const lock = std::lock_guard<std::mutex>{mutex_};
         // Reset action result
         wrapped_result_.reset();
 
@@ -106,6 +109,7 @@ class ActionClientNode : public BT::ActionNodeBase {
       }  // case BT::NodeStatus::IDLE
       // While waiting for a result
       case BT::NodeStatus::RUNNING: {  // Depending on the action client state
+        auto const lock = std::lock_guard<std::mutex>{mutex_};
         if (!client_api_handle_->isActionActive()) {
           // Check if a result is received
           if (!wrapped_result_.has_value()) {
@@ -131,6 +135,7 @@ class ActionClientNode : public BT::ActionNodeBase {
 
   /// \brief This function is called when the BT tree is stopped
   void halt() override {
+    auto const lock = std::lock_guard<std::mutex>{mutex_};
     // If the bt is terminated the running action should be canceled
     if (!client_api_handle_->cancelGoal()) {
       // If it is not possible to cancel the goal this node fails
@@ -165,5 +170,8 @@ class ActionClientNode : public BT::ActionNodeBase {
 
   // Action result
   std::optional<WrappedResult> wrapped_result_;
+
+  // To avoid race conditions
+  mutable std::mutex mutex_;
 };
 }  // namespace BT::ros2
