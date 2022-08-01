@@ -76,6 +76,7 @@ class ActionClientNode : public BT::ActionNodeBase {
         // If defineGoal returns no goal the node fails
         if (!goal.has_value()) {
           // Set node status as failed and return failed
+          std::cout << "Goal has no value" << std::endl;
           return BT::NodeStatus::FAILURE;
         }
 
@@ -97,6 +98,7 @@ class ActionClientNode : public BT::ActionNodeBase {
         // Check if sending of the goal was successful
         if (!sending_successful) {
           // Set node status as failed and return failed
+          std::cout << "Sending goal failure" << std::endl;
           return BT::NodeStatus::FAILURE;
         }
         // Set node status running
@@ -107,10 +109,8 @@ class ActionClientNode : public BT::ActionNodeBase {
         if (!client_api_handle_->isActionActive()) {
           // Check if a result is received
           if (!wrapped_result_.has_value()) {
-            // If no result is available, something has gone wrong so set node
-            // to failure. The most likely reason for this is that the server
-            // did not answer in time to a goal or cancel request
-            return BT::NodeStatus::FAILURE;
+            // Return RUNNING if a result has not been sent by the server yet.
+            return BT::NodeStatus::RUNNING;
           } else {
             // If a result is received, process it. This also determines the
             // final node status of an action iteration
