@@ -135,7 +135,6 @@ class ActionClientNode : public BT::ActionNodeBase {
 
   /// \brief This function is called when the BT tree is stopped
   void halt() override {
-    auto const lock = std::lock_guard<std::mutex>{mutex_};
     // If the bt is terminated the running action should be canceled
     if (!client_api_handle_->cancelGoal()) {
       // If it is not possible to cancel the goal this node fails
