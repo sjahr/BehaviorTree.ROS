@@ -94,6 +94,7 @@ class ActionClientNode : public BT::ActionNodeBase {
             },
             // Result callback
             [this](WrappedResult const& wrapped_result) {
+              auto const callback_lock = std::lock_guard<std::mutex>{mutex_};
               // Just store the result in a member variable
               wrapped_result_ = wrapped_result;
             });
