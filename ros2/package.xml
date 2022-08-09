@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>behaviortree_ros2</name>
+  <version>0.0.1</version>
+  <description>Templates and example implementations of BT nodes that implement a ROS2 action/service server</description>
+  <maintainer email="todo@todo.com">TODO</maintainer>
+  <license>MIT</license>
+
+  <author email="sebastian.jahr@picknik.ai">Sebastian Jahr</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>example_interfaces</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
+
+  <exec_depend>examples_rclcpp_minimal_action_server</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
